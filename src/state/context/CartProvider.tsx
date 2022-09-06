@@ -9,6 +9,7 @@ import { CartContext, defaultState } from "./cart-context";
 export enum CartActionType {
   ADD = "ADD",
   REMOVE = "REMOVE",
+  CLEAR = "CLEAR",
 }
 
 interface CartContextProviderProps {
@@ -76,6 +77,10 @@ const cartReducer = (
       };
     }
 
+    case CartActionType.CLEAR: {
+      return defaultState;
+    }
+
     default:
       return defaultState;
   }
@@ -100,11 +105,18 @@ const CartContextProvider: React.FC<CartContextProviderProps> = ({
     });
   };
 
+  const clearCartHandler = () => {
+    dispatchCartAction({
+      type: CartActionType.CLEAR,
+    });
+  };
+
   const cartContext = {
     items: cartState.items,
     totalAmount: cartState.totalAmount,
     addItem: addItemToCartHandler,
     removeItem: removeItemFromCartHandler,
+    clearCart: clearCartHandler,
   };
 
   return (

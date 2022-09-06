@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { useContext, useState } from "react";
+import { UserDataInterface } from "../../../types";
 import { CartContext } from "../../state/context/cart-context";
 import Modal from "../UI/Modal";
 import classes from "./Cart.module.css";
@@ -10,12 +12,25 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ onCloseCart }) => {
-  const { items, totalAmount } = useContext(CartContext);
+  const { items, totalAmount, clearCart } = useContext(CartContext);
 
   const [isCheckout, setIsCheckout] = useState<boolean>(false);
+  const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
+  const [didSubmit, setDidSubmit] = useState<boolean>(false);
 
   const orderHandler = () => {
     setIsCheckout(true);
+  };
+
+  const submitOrderHandler = async (userData: UserDataInterface) => {
+    setIsSubmiting(true);
+    const response = await axios.post(
+      "https://food-order-app-udemy-23a1e-default-rtdb.europe-west1.firebasedatabase.app/orders.json",
+      { user: userData, orderedItems: items }
+    );
+    setIsSubmiting(false);
+    setDidSubmit(true);
+    clearCart();
   };
 
   const modalActions = (
@@ -31,8 +46,8 @@ const Cart: React.FC<CartProps> = ({ onCloseCart }) => {
     </div>
   );
 
-  return (
-    <Modal onCartClose={onCloseCart}>
+  const cartModalContent = (
+    <>
       <ul className={classes["cart-items"]}>
         {items.map((item) => (
           <CartItem key={item.id} item={item} />
@@ -42,8 +57,31 @@ const Cart: React.FC<CartProps> = ({ onCloseCart }) => {
         <span>Total Amount</span>
         <span>{`$${totalAmount.toFixed(2)}`}</span>
       </div>
-      {isCheckout && <Checkout onCancel={onCloseCart} />}
+      {isCheckout && (
+        <Checkout onCancel={onCloseCart} onConfirm={submitOrderHandler} />
+      )}
       {!isCheckout && modalActions}
+    </>
+  );
+
+  const isSubmittingModalContent = <p>Sending order data...</p>;
+
+  const didSubmitModalContent = (
+    <>
+      <p>Successfully sent the order</p>
+      <div className={classes.actions}>
+        <button onClick={onCloseCart} className={classes["button"]}>
+          Close
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <Modal onCartClose={onCloseCart}>
+      {!isSubmiting && !didSubmit && cartModalContent}
+      {isSubmiting && isSubmittingModalContent}
+      {didSubmit && !isSubmiting && didSubmitModalContent}
     </Modal>
   );
 };

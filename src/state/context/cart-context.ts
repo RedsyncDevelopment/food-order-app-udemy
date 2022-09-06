@@ -6,13 +6,15 @@ export interface CartContextInterface {
   totalAmount: number;
   addItem: (item: MealInterface) => void;
   removeItem: (id: string) => void;
+  clearCart: () => void;
 }
 
 export const defaultState: CartContextInterface = {
   items: [],
   totalAmount: 0,
-  addItem(item) {},
-  removeItem(id) {},
+  addItem: (item) => {},
+  removeItem: (id) => {},
+  clearCart: () => {},
 };
 
 export const CartContext =

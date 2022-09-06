@@ -23,7 +23,20 @@ export interface RemoveFromCartReducerAction {
   payload: string;
 }
 
+export interface ClearFromCartReducerAction {
+  type: CartActionType.CLEAR;
+  payload?: string;
+}
+
 // Combining 2 different Cart Reducer Actions
 export type CartReducerAction =
   | AddToCartReducerAction
-  | RemoveFromCartReducerAction;
+  | RemoveFromCartReducerAction
+  | ClearFromCartReducerAction;
+
+export interface UserDataInterface {
+  name?: string;
+  postal?: string;
+  street?: string;
+  city?: string;
+}
